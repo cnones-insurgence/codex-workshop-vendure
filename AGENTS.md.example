@@ -1,0 +1,74 @@
+# Vendure Codebase
+
+## Architecture
+- NestJS-based, uses dependency injection throughout
+- GraphQL API with separate Shop and Admin schemas
+- Services in `packages/core/src/service/services/`
+- Resolvers in `packages/core/src/api/resolvers/`
+- State machines in `packages/core/src/service/helpers/`
+
+## Coding Standards
+- Error responses must use Vendure's ErrorResult pattern (GraphQL union types), never throw raw exceptions from services
+- Validation happens in service methods using guard checks that return ErrorResult types — Vendure does NOT use class-validator
+- New fields require both a GraphQL schema change AND a migration
+- All service methods must be async and return typed results
+- Tests use Vitest (`vi.fn()`, `vi.spyOn()`), not Jest
+
+## Patterns to Follow
+- See `packages/core/src/api/resolvers/shop/shop-order.resolver.ts` for resolver patterns
+- See `packages/core/src/service/services/order.service.ts` for service patterns
+- See existing ErrorResult union types in `packages/core/src/common/error/error-result.ts`
+- Input validation returns ErrorResult types like `NegativeQuantityError`, `OrderLimitError`, etc.
+
+## What NOT to Do
+- Don't throw exceptions from services — use ErrorResult union types
+- Don't add class-validator decorators — that's not how this codebase does validation
+- Don't modify entity files without creating a corresponding migration
+- Don't use `jest.fn()` or `jest.spyOn()` — use `vi.fn()` and `vi.spyOn()` (Vitest)
+
+## Organisation-Specific Rules (CW House Style)
+
+These rules are **not visible in the upstream Vendure code**. They apply to all changes made in this fork.
+
+### Method documentation
+Every public service method must have a JSDoc comment whose **first line** is a `@since` tag, and whose **second line** is an `@ref` tag pointing to the originating Jira ticket. Example:
+
+```ts
+/**
+ * @since 3.7.0
+ * @ref CW-1234
+ *
+ * Records an audit log entry for an order placement.
+ */
+async record(...) { ... }
+```
+
+### Error messages
+All user-facing error messages (ErrorResult `message`, thrown errors, log lines that may surface to support) must be:
+
+- Sentence case — first letter capitalised, the rest lowercase unless a proper noun.
+- British English spelling (`authorise`, `cancelled`, `colour`, `behaviour`).
+- No trailing punctuation.
+
+Bad: `"Customer not found."`
+Good: `"Customer not found"`
+
+Bad: `"Authorization failed."`
+Good: `"Authorisation failed"`
+
+### ErrorResult shape
+Every new ErrorResult subclass must include a `correlationId: string` field, populated from the request context. The `correlationId` is logged with the error and returned to the client so support can trace it.
+
+### Database column naming
+TypeORM `@Column()` fields must use snake_case in the database, regardless of the property name. Use `@Column({ name: 'created_at' })` explicitly — never rely on TypeORM defaults.
+
+### Plugin package README
+Every plugin under `packages/*-plugin/` must ship a top-level `README.md` with these sections in order:
+
+1. `## Overview` — one paragraph, what the plugin does.
+2. `## Usage` — minimal install + config example.
+3. `## Architecture` — entities, services, event flow.
+4. `## Pitfalls` — known gotchas, ordering constraints, migration warnings.
+
+### Event subscriber tests
+Every new event subscriber must have a unit test that uses a fake `EventBus` to verify the subscriber's side effects. Subscribers without unit tests will not pass review.

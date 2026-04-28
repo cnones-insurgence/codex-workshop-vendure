@@ -1,3 +1,24 @@
+<!--
+  ─────────────────────────────────────────────────────────────────────
+  Workshop fork notice
+  ─────────────────────────────────────────────────────────────────────
+  This is a workshop fork of vendurehq/vendure used as the demo repo
+  for the Codex Workshop.
+
+  → Workshop setup, lab directories, and facilitator notes:
+    [WORKSHOP.md](./WORKSHOP.md)
+
+  Workshop branch: workshop/v1
+  Base commit:     3fc46f100c41d24ca39dad37fd8296b7d5509f8b
+
+  Source code under packages/ is unmodified from upstream.
+  ─────────────────────────────────────────────────────────────────────
+-->
+
+> 🛠 **Codex Workshop fork.** See [WORKSHOP.md](./WORKSHOP.md) for setup, lab directories, and facilitator notes. The Vendure README continues below, unmodified.
+
+---
+
 <p align="center">
   <a href="https://vendure.io">
     <img alt="Vendure logo" height="60" width="auto" src="https://a.storyblok.com/f/328257/699x480/8dbb4c7a3c/logo-icon.png">
